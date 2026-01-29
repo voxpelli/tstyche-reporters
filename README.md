@@ -211,8 +211,8 @@ import type {
 
 The reporters support two output modes:
 
-- **CLI mode** (default): Uses ANSI colors and symbols (✔/✖)
-- **Markdown mode**: Uses emoji symbols (:white_check_mark:/:stop_sign:)
+- **CLI mode** (default): Uses ANSI colors, terminal symbols (✔/✖), and chalk formatting
+- **Markdown mode**: Uses plain text with emoji symbols (:white_check_mark:/:stop_sign:) and markdown formatting
 
 To enable Markdown mode, set the environment variable:
 

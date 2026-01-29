@@ -1,6 +1,6 @@
 # @voxpelli/tstyche-reporters
 
-Custom [TStyche](https://tstyche.dev/) reporters with Mocha-style and dot-style output, featuring CI-aware Markdown/CLI dual-mode formatting.
+Custom [TStyche](https://tstyche.dev/) reporters with Mocha-style and dot-style output, featuring environment-controlled Markdown/CLI dual-mode formatting.
 
 [![npm version](https://img.shields.io/npm/v/@voxpelli/tstyche-reporters.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/tstyche-reporters)
 [![npm downloads](https://img.shields.io/npm/dm/@voxpelli/tstyche-reporters.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/tstyche-reporters)
@@ -56,7 +56,7 @@ Or in `tstyche.config.json`:
   ✔ should work correctly
 ```
 
-**Markdown Output (CI):**
+**Markdown Output:**
 
 ```markdown
 # uses TypeScript 5.8.3 with ./tsconfig.json

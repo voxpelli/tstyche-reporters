@@ -59,7 +59,10 @@ describe('tstyche-reporters', () => {
         // Verify CLI mode is enabled (chalk is defined in CLI mode)
         assert.ok(reporter.format.chalk);
       } finally {
-        if (originalValue !== undefined) {
+        if (originalValue === undefined) {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          delete process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+        } else {
           // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
           process.env['TSTYCHE_REPORTERS_MARKDOWN'] = originalValue;
         }

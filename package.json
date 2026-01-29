@@ -1,6 +1,6 @@
 {
   "name": "@voxpelli/tstyche-reporters",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Custom TStyche reporters with Mocha-style and dot-style output, featuring CI-aware Markdown/CLI dual-mode formatting",
   "homepage": "https://github.com/voxpelli/tstyche-reporters",
   "repository": {

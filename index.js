@@ -1,1 +1,1 @@
-export { main } from './lib/main.js';
+export * from './lib/main.js';

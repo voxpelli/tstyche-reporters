@@ -1,75 +1,227 @@
-# Node Module Template
+# @voxpelli/tstyche-reporters
 
-A GitHub template repo for node modules
+Custom [TStyche](https://tstyche.dev/) reporters with Mocha-style and dot-style output, featuring CI-aware Markdown/CLI dual-mode formatting.
 
-<!--
-[![npm version](https://img.shields.io/npm/v/@voxpelli/node-module-template.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/node-module-template)
-[![npm downloads](https://img.shields.io/npm/dm/@voxpelli/node-module-template.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/node-module-template)
--->
+[![npm version](https://img.shields.io/npm/v/@voxpelli/tstyche-reporters.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/tstyche-reporters)
+[![npm downloads](https://img.shields.io/npm/dm/@voxpelli/tstyche-reporters.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/tstyche-reporters)
 [![neostandard javascript style](https://img.shields.io/badge/code_style-neostandard-7fffff?style=flat&labelColor=ff80ff)](https://github.com/neostandard/neostandard)
 [![Module type: ESM](https://img.shields.io/badge/module%20type-esm-brightgreen)](https://github.com/voxpelli/badges-cjs-esm)
 [![Types in JS](https://img.shields.io/badge/types_in_js-yes-brightgreen)](https://github.com/voxpelli/types-in-js)
 [![Follow @voxpelli@mastodon.social](https://img.shields.io/mastodon/follow/109247025527949675?domain=https%3A%2F%2Fmastodon.social&style=social)](https://mastodon.social/@voxpelli)
 
-## About This Template
+## Features
 
-This template is designed for **creating Node.js library modules** - packages that provide reusable functionality to other projects.
+- 🎨 **Dual-mode output** – Automatically switches between CLI (colors/symbols) and Markdown (emoji) based on environment
+- 🔍 **CI detection** – Detects GitHub Actions, GitLab CI, CircleCI, Travis, and Buildkite
+- 📊 **Two reporter styles** – Mocha-style hierarchical output or compact dot notation
+- 🔄 **Multi-version support** – Displays TypeScript version headers when testing against multiple compiler versions
+- ⚡ **Streaming output** – Tests are printed as they execute, not buffered
+- 🧩 **Extensible base class** – Create your own custom reporters
 
-**When to use this template:**
-- Building npm libraries and utilities
-- Creating shared code modules
-- Developing packages without CLI or server components
+## Installation
 
-**Related templates:**
-- **[node-cli-template](https://github.com/voxpelli/node-cli-template)** - For command-line tools and CLI applications
-- **[node-app-template](https://github.com/voxpelli/node-app-template)** - For web servers, REST APIs, and long-running services
-
-**For detailed coding guidelines and GitHub Copilot instructions**, see [`.github/copilot-instructions.md`](.github/copilot-instructions.md)
+```bash
+npm install @voxpelli/tstyche-reporters
+```
 
 ## Usage
 
-```javascript
-import { something } from '@voxpelli/node-module-template';
+### Mocha Reporter
 
-// Use that something
+Hierarchical, readable test output with indented describe blocks:
+
+```bash
+npx tstyche --reporters ./node_modules/@voxpelli/tstyche-reporters/lib/tstyche-mocha-reporter.js,summary
 ```
+
+Or in `tstyche.config.json`:
+
+```json
+{
+  "reporters": ["./node_modules/@voxpelli/tstyche-reporters/lib/tstyche-mocha-reporter.js", "summary"]
+}
+```
+
+**CLI Output:**
+
+```
+# uses TypeScript 5.8.3 with ./tsconfig.json
+
+## MyComponent
+  ✔ should accept valid props
+  ✔ should reject invalid props
+  ✖ should handle edge case
+
+## AnotherComponent
+  ✔ should work correctly
+```
+
+**Markdown Output (CI):**
+
+```markdown
+# uses TypeScript 5.8.3 with ./tsconfig.json
+
+## MyComponent
+:white_check_mark: should accept valid props
+:white_check_mark: should reject invalid props
+:stop_sign: should handle edge case
+
+## AnotherComponent
+:white_check_mark: should work correctly
+```
+
+### Dot Reporter
+
+Compact dot-style output, ideal for multi-version test runs:
+
+```bash
+npx tstyche --target '5.4 || 5.8 || next' --reporters ./node_modules/@voxpelli/tstyche-reporters/lib/tstyche-dot-reporter.js,summary
+```
+
+**Output:**
+
+```
+# uses TypeScript 5.4.5 with ./tsconfig.json
+Error: Invalid configuration...
+F.F..F.F.F.F.F.F......................
+# uses TypeScript 5.8.3 with ./tsconfig.json
+........................................................
+# uses TypeScript 5.9.3 with ./tsconfig.json
+........................................................
+```
+
+- `.` = Pass
+- `F` = Fail
+- Lines wrap at 80 characters
 
 ## API
 
-### something()
+### TstycheMochaReporter
 
-Takes a value (`input`), does something configured by the config (`configParam`) and returns the processed value asyncly(`output`)
+Mocha-style hierarchical reporter with streaming output.
 
-#### Syntax
-
-```ts
-something(input, [options]) => Promise<true>
+```javascript
+import { TstycheMochaReporter } from '@voxpelli/tstyche-reporters';
 ```
 
-#### Arguments
+#### Features
 
-* `input` – _`string`_ – the input of the method
-* `options` – _[`SomethingOptions`](#somethingoptions)_ – optional options
+- Hierarchical output with properly indented describe blocks
+- Compiler version headers when TypeScript version changes
+- Automatic CLI/Markdown mode switching
+- Symbol handling: ✔/✖ in CLI, :white_check_mark:/:stop_sign: in Markdown
 
-#### SomethingOptions
+### TstycheDotReporter
 
-* `maxAge` – _`number`_ – the maximum age of latest release to include
-* `minDownloadsLastMonth = 400` – _`number`_ – the minimum amount of downloads needed to be returned
-* `skipPkg` – _`boolean`_ – when set skips resolving `package.json`
+Compact dot-style reporter optimized for multi-version runs.
 
-#### Returns
+```javascript
+import { TstycheDotReporter } from '@voxpelli/tstyche-reporters';
+```
 
-A `Promise` that resolves to `true`
+#### Features
 
-## Used by
+- One character per test (`.` = pass, `F` = fail)
+- Compiler version headers between different TypeScript versions
+- 80-character line wrapping
+- Minimal output for quick visual scanning
 
-* [`example`](https://example.com/) – used by this one to do X and Y
+### TstycheBaseReporter
 
-## Similar modules
+Abstract base class for creating custom TStyche reporters.
 
-* [`example`](https://example.com/) – is similar in this way
+```javascript
+import { TstycheBaseReporter } from '@voxpelli/tstyche-reporters';
 
-## See also
+class MyCustomReporter extends TstycheBaseReporter {
+  _onTestPass(payload) {
+    // Custom pass handling
+  }
 
-* [Announcement blog post](#)
-* [Announcement tweet](#)
+  _onTestFail(payload) {
+    // Custom fail handling
+  }
+
+  _onRunEnd(payload) {
+    // Custom run end handling
+  }
+}
+
+export default MyCustomReporter;
+```
+
+#### Constructor
+
+```typescript
+new TstycheBaseReporter(resolvedConfig: ResolvedConfig)
+```
+
+- `resolvedConfig` – TStyche's resolved configuration object
+
+#### Protected Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `resolvedConfig` | `ResolvedConfig` | TStyche configuration |
+| `format` | `MarkdownOrChalk` | Dual-mode formatter instance |
+| `currentCompilerVersion` | `string \| undefined` | Current TypeScript version being tested |
+| `lastShownCompilerVersion` | `string \| undefined` | Last version header printed |
+
+#### Abstract Methods (must override)
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `_onTestPass` | `payload: TstycheEventPayload<'test:pass'>` | Handle passing test |
+| `_onTestFail` | `payload: TstycheEventPayload<'test:fail'>` | Handle failing test |
+| `_onRunEnd` | `payload: TstycheEventPayload<'run:end'>` | Handle run completion |
+
+#### Optional Override Methods
+
+| Method | Parameters | Description |
+|--------|------------|-------------|
+| `_onRunStart` | `payload` | Handle run start (resets state) |
+| `_onProjectUses` | `payload` | Handle compiler version change |
+| `_onFileStart` | `payload` | Handle file start |
+| `_onDescribeStart` | `payload` | Handle describe block start |
+| `_onDescribeEnd` | `payload` | Handle describe block end |
+| `_onError` | `reporterEvent` | Handle error events |
+| `_beforePrintCompilerVersion` | – | Hook before version header |
+| `_onNonImplementedEvent` | `reporterEvent` | Handle unimplemented events |
+
+#### Utility Methods
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `_formatDiagnostic` | `diagnostic: Diagnostic` | `string` | Format TStyche/TypeScript diagnostic |
+| `_printErrors` | `payload` | `void` | Print error diagnostics |
+| `_printCompilerVersion` | – | `void` | Print TypeScript version header |
+
+### Type Exports
+
+```typescript
+import type {
+  TstycheEvent,
+  TstycheEventPayload,
+  TstycheErrorEvents,
+  TstycheNonImplementedEvents,
+} from '@voxpelli/tstyche-reporters';
+```
+
+## CI Detection
+
+The reporters automatically detect CI environments by checking for these environment variables:
+
+- `CI`
+- `GITHUB_ACTIONS`
+- `GITLAB_CI`
+- `CIRCLECI`
+- `TRAVIS`
+- `BUILDKITE`
+
+When detected, output switches to Markdown mode with emoji symbols instead of ANSI colors.
+
+## Related Projects
+
+- [TStyche](https://tstyche.dev/) – Type testing tool for TypeScript
+- [markdown-or-chalk](https://github.com/voxpelli/markdown-or-chalk) – Dual-mode CLI/Markdown formatting
+- [node-test-pretty-reporter](https://github.com/voxpelli/node-test-pretty-reporter) – Similar reporter for Node.js test runner

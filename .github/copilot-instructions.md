@@ -1,255 +1,78 @@
-# GitHub Copilot Instructions for Node Module Template
+# @voxpelli/tstyche-reporters
 
-## Overview
+Custom [TStyche](https://tstyche.dev/) reporters for TypeScript type testing, featuring Mocha-style hierarchical output and compact dot notation with automatic CI-aware Markdown/CLI dual-mode formatting.
 
-This repository is a **template for creating Node.js library modules** - packages that provide reusable functionality to other projects. It implements best practices for modern Node.js module development with TypeScript types in JavaScript, ESM modules, and comprehensive testing.
+## Quick Overview
 
-### When to Use This Template
-
-Use this template when creating:
-- **Libraries and utilities** that will be published to npm
-- **Shared code modules** used across multiple projects
-- **Packages with no CLI or server components**
-
-### Related Templates
-
-Consider these alternatives depending on your project type:
-
-```mermaid
-graph TD
-    A[What are you building?] --> B{Has CLI?}
-    A --> C{Is it a service/API?}
-    A --> D{Is it a library?}
-    
-    B -->|Yes| E[node-cli-template]
-    C -->|Yes| F[node-app-template]
-    D -->|Yes| G[node-module-template]
-    
-    E --> H[Command-line tools<br/>CLI applications<br/>Build tools]
-    F --> I[Web servers<br/>REST APIs<br/>Background services]
-    G --> J[npm libraries<br/>Shared utilities<br/>Frameworks]
-    
-    style G fill:#90EE90
-    style E fill:#FFB6C1
-    style F fill:#87CEEB
-```
-
-**Use [node-cli-template](https://github.com/voxpelli/node-cli-template) when:**
-- Building command-line tools or CLI applications
-- Creating build tools or generators
-- Need to execute commands from the terminal
-
-**Use [node-app-template](https://github.com/voxpelli/node-app-template) when:**
-- Building web servers, REST APIs, or GraphQL services
-- Creating background workers or daemons
-- Need long-running processes or services
-
-### Project Architecture
+This module provides two ready-to-use TStyche reporters plus an extensible base class:
 
 ```mermaid
 graph LR
-    A[index.js] -->|exports| B[lib/main.js]
-    B --> C[Implementation]
-    D[index.d.ts] -->|types| C
-    E[test/*.spec.js] -->|validates| C
-    
-    F[TypeScript] -->|generates| D
-    G[ESLint] -->|validates| C
-    H[Mocha+Chai] -->|runs| E
-    
-    style A fill:#FFE4B5
-    style D fill:#E0BBE4
-    style E fill:#B4E7CE
+    subgraph "This Module"
+        Base[TstycheBaseReporter]
+        Mocha[TstycheMochaReporter]
+        Dot[TstycheDotReporter]
+    end
+
+    Base --> Mocha
+    Base --> Dot
+    Base -.->|extend| Custom[Your Custom Reporter]
+
+    Mocha -->|outputs| MochaOut["## describe<br/>✔ test passed<br/>✖ test failed"]
+    Dot -->|outputs| DotOut["...F..F...."]
+
+    style Base fill:#E0BBE4
+    style Mocha fill:#B4E7CE
+    style Dot fill:#FFE4B5
+    style Custom fill:#87CEEB,stroke-dasharray: 5 5
 ```
 
-### Development Workflow
+### Module Architecture
 
 ```mermaid
-sequenceDiagram
-    participant Dev as Developer
-    participant Git as Git Hooks
-    participant CI as GitHub Actions
-    
-    Dev->>Dev: Make code changes
-    Dev->>Dev: npm test (local)
-    Dev->>Git: git commit
-    Git->>Git: Run husky hooks
-    Git->>Dev: ✓ Hooks passed
-    Dev->>CI: git push
-    CI->>CI: Run lint workflow
-    CI->>CI: Run test workflow
-    CI->>CI: Run TypeScript checks
-    CI->>Dev: ✓ All checks passed
+graph TB
+    subgraph "Package Exports"
+        Index[index.js] --> Main[lib/main.js]
+    end
+
+    subgraph "Core Implementation"
+        Main --> BaseReporter[tstyche-base-reporter.js]
+        Main --> MochaReporter[tstyche-mocha-reporter.js]
+        Main --> DotReporter[tstyche-dot-reporter.js]
+        BaseReporter --> Utils[utils.js]
+    end
+
+    subgraph "Dependencies"
+        BaseReporter --> MOC[markdown-or-chalk]
+        BaseReporter -.->|types| TStyche[tstyche/tstyche]
+    end
+
+    subgraph "Type Definitions"
+        Index -.-> IndexDTS[index.d.ts]
+        BaseReporter -.-> BaseDTS[*.d.ts]
+    end
+
+    style Index fill:#FFE4B5
+    style Main fill:#FFE4B5
+    style BaseReporter fill:#E0BBE4
+    style MochaReporter fill:#B4E7CE
+    style DotReporter fill:#B4E7CE
 ```
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🎨 Dual-mode output | CLI (colors/symbols) or Markdown (emoji) based on environment |
+| 🔍 CI detection | GitHub Actions, GitLab CI, CircleCI, Travis, Buildkite |
+| 📊 Two styles | Mocha hierarchical or dot notation |
+| 🔄 Multi-version | TypeScript version headers when testing multiple compilers |
+| ⚡ Streaming | Real-time test output, not buffered |
+| 🧩 Extensible | Base class for custom reporters |
 
 ---
 
-## Coding Guidelines for GitHub Copilot
-
-### Code Style and Standards
-
-1. **JavaScript Style**
-   - Use ESM (ECMAScript Modules) syntax exclusively (`import`/`export`)
-   - Follow [neostandard](https://github.com/neostandard/neostandard) JavaScript style guide
-   - Use single quotes for strings
-   - Include semicolons
-   - 2-space indentation
-
-2. **Type Safety**
-   - Use TypeScript for type definitions but write JavaScript for implementation
-   - Include JSDoc comments with type annotations
-   - Maintain strict type coverage (>99%)
-   - Generate `.d.ts` files from JSDoc annotations
-   - Example:
-     ```javascript
-     /**
-      * @param {string} input - The input value
-      * @param {SomethingOptions} [options] - Optional configuration
-      * @returns {Promise<boolean>}
-      */
-     export async function something(input, options) {
-       // implementation
-     }
-     ```
-
-3. **Module Structure**
-   - Main entry point: `index.js` (exports from lib)
-   - Implementation: `lib/*.js` files
-   - Type definitions: `lib/*-types.d.ts` for complex types
-   - Keep index.js minimal - just re-exports
-
-4. **File Organization**
-   ```
-   /index.js              # Main entry, re-exports from lib
-   /index.d.ts            # Generated type definitions
-   /lib/main.js           # Core implementation
-   /lib/advanced-types.d.ts  # Complex type definitions
-   /test/*.spec.js        # Mocha test files
-   ```
-
-### Testing
-
-1. **Test Framework**
-   - Use Mocha for test runner
-   - Use Chai for assertions
-   - Place tests in `test/` directory with `.spec.js` extension
-   - Example:
-     ```javascript
-     import { describe, it } from 'mocha';
-     import chai from 'chai';
-     
-     const { expect } = chai;
-     
-     describe('something()', () => {
-       it('should return true', async () => {
-         const result = await something('test');
-         expect(result).to.equal(true);
-       });
-     });
-     ```
-
-2. **Code Coverage**
-   - Use c8 for coverage reporting
-   - Aim for high coverage on new code
-   - Coverage reports generated in LCOV and text formats
-
-3. **Running Tests**
-   - `npm test` - Full test suite with checks
-   - `npm run test:mocha` - Just the tests
-   - `npm run check` - Linting and type checking only
-
-### Building and Type Generation
-
-1. **Build Process**
-   - `npm run build` - Clean and generate type declarations
-   - TypeScript compiler generates `.d.ts` files from JSDoc
-   - Clean old declarations before building
-
-2. **Type Configuration**
-   - `tsconfig.json` - Main TypeScript config for type checking
-   - `declaration.tsconfig.json` - Config for generating declarations
-   - Commit hand-written type files (`lib/*-types.d.ts`, `index.d.ts`)
-   - Don't commit auto-generated `.d.ts` files (generated from JSDoc)
-
-### Dependencies
-
-1. **Adding Dependencies**
-   - Avoid adding dependencies unless absolutely necessary
-   - Prefer modern Node.js built-in APIs
-   - Production dependencies should be minimal
-   - Use exact versions in package.json when possible
-
-2. **Development Dependencies**
-   - Keep devDependencies up to date via Renovate
-   - Use `installed-check` to verify dependency hygiene
-   - Use `knip` to detect unused dependencies
-
-### Code Quality Tools
-
-1. **ESLint**
-   - Configuration: `eslint.config.js`
-   - Based on `@voxpelli/eslint-config`
-   - Run: `npm run check:lint`
-   - Fix automatically when possible
-
-2. **TypeScript Checking**
-   - Run: `npm run check:tsc`
-   - Ensures type correctness without compilation
-   - Check type coverage: `npm run check:type-coverage`
-
-3. **Knip**
-   - Detects unused files, dependencies, and exports
-   - Configuration: `.knip.jsonc`
-   - Run: `npm run check:knip`
-
-### Git and Version Control
-
-1. **Commits**
-   - Use conventional commit messages when appropriate
-   - Husky pre-commit hooks will run checks
-   - Keep commits focused and atomic
-
-2. **Branching**
-   - Main branch: `main`
-   - Feature branches: descriptive names
-   - CI runs on all pull requests
-
-### Node.js Version Support
-
-- Required versions: `^20.15.0 || >=22.2.0`
-- Target latest LTS versions
-- Use modern JavaScript features available in these versions
-- No transpilation needed
-
-### Publishing (for reference)
-
-- Package is published to npm
-- `files` field in package.json controls what's published
-- Include: `index.js`, `index.d.ts`, `lib/**/*.js`, `lib/**/*.d.ts`
-- Exclude: tests, config files, source `.ts` files
-
-### Special Notes
-
-1. **This is a Template Repository**
-   - This repo serves as a starting point for new modules
-   - When using this template, update:
-     - `package.json` (name, description, repository, keywords)
-     - `README.md` (replace with actual project documentation)
-     - Implementation in `lib/` directory
-     - Tests in `test/` directory
-
-2. **External Projects Using This Style**
-   - Projects can reference these instructions to understand the coding style
-   - This template demonstrates Node.js module best practices
-   - See README for real-world usage examples
-
-3. **Workflow Files**
-   - `.github/workflows/lint.yml` - Linting checks
-   - `.github/workflows/nodejs.yml` - Test suite on multiple Node versions
-   - `.github/workflows/ts-internal.yml` - TypeScript internal checks
-   - `.github/workflows/dependency-review.yml` - Dependency security
-
-### Common Commands
+## Development Commands
 
 ```bash
 # Install dependencies
@@ -258,68 +81,181 @@ npm install
 # Run all checks and tests
 npm test
 
+# Run only checks (lint, types, knip)
+npm run check
+
 # Run only linting
 npm run check:lint
 
-# Run only tests
-npm run test:mocha
+# Run only type checking
+npm run check:tsc
 
 # Build type declarations
 npm run build
 
 # Clean generated files
 npm run clean
+
+# Test with dot reporter
+npm run test:tstyche-dot
+
+# Test with mocha reporter
+npm run test:tstyche-mocha
 ```
-
-### Anti-Patterns to Avoid
-
-1. ❌ Don't use CommonJS (`require`/`module.exports`)
-2. ❌ Don't add unnecessary dependencies
-3. ❌ Don't skip type annotations in JSDoc
-4. ❌ Don't commit auto-generated `.d.ts` files (only commit hand-written ones)
-5. ❌ Don't use `any` types without good reason
-6. ❌ Don't skip tests for new functionality
-7. ❌ Don't mix module systems
-
-### Best Practices
-
-1. ✅ Write clear JSDoc comments with types
-2. ✅ Export everything through index.js
-3. ✅ Keep functions small and focused
-4. ✅ Use async/await for asynchronous operations
-5. ✅ Validate inputs and provide helpful error messages
-6. ✅ Write tests that are clear and maintainable
-7. ✅ Follow the existing code style consistently
 
 ---
 
-## Quick Reference for External Projects
+## Coding Guidelines for Copilot
 
-If your project wants to follow the voxpelli Node.js module style:
+### Code Standards
 
-1. **Template Choice**: Start with the appropriate template
-   - Libraries → `node-module-template`
-   - CLIs → `node-cli-template`
-   - Services → `node-app-template`
+#### JavaScript Style
+- **ESM only**: Use `import`/`export` exclusively (no CommonJS)
+- **Style guide**: Follow [neostandard](https://github.com/neostandard/neostandard)
+- **Strings**: Single quotes
+- **Semicolons**: Always include
+- **Indentation**: 2 spaces
 
-2. **Key Characteristics**:
-   - ESM modules only
-   - Types in JavaScript (JSDoc + TypeScript)
-   - Neostandard code style
-   - Mocha + Chai testing
-   - Strict type coverage
-   - Minimal dependencies
+#### Type Safety
+- Write JavaScript with JSDoc type annotations
+- TypeScript generates `.d.ts` files from JSDoc
+- Maintain strict type coverage (>99%)
+- Import types using `/** @import { Type } from 'module' */`
 
-3. **Reference Documentation**:
-   - This file: Coding guidelines and standards
-   - README.md: Project-specific usage
-   - package.json: Available scripts and commands
+Example:
+```javascript
+/** @import { ResolvedConfig, ReporterEvent } from 'tstyche/tstyche' */
 
-4. **Getting Started**:
-   ```bash
-   # Use this template
-   npx degit voxpelli/node-module-template my-module
-   cd my-module
-   npm install
-   npm test
-   ```
+/**
+ * Handle a test event.
+ *
+ * @param {ReporterEvent} event - The TStyche event tuple
+ * @returns {void}
+ */
+on(event) {
+  // implementation
+}
+```
+
+### File Organization
+
+```
+/index.js                    # Re-exports from lib/main.js
+/index.d.ts                  # Hand-written, exports from lib/main.js
+/lib/main.js                 # Module exports
+/lib/tstyche-base-reporter.js    # Base class implementation
+/lib/tstyche-dot-reporter.js     # Dot reporter implementation
+/lib/tstyche-mocha-reporter.js   # Mocha reporter implementation
+/lib/utils.js                # Utility functions
+/test/*.spec.js              # Node.js test runner tests
+/typetests/*.test.ts         # TStyche type tests
+```
+
+### Testing Requirements
+
+1. **Unit tests**: Use Node.js test runner with `node --test`
+2. **Type tests**: Use TStyche in `typetests/` directory
+3. **Coverage**: c8 generates LCOV and text reports
+4. **All tests must pass** before committing
+
+### Extending Reporters
+
+When creating or modifying reporters, extend `TstycheBaseReporter`:
+
+```javascript
+import { TstycheBaseReporter } from './tstyche-base-reporter.js';
+
+export default class MyReporter extends TstycheBaseReporter {
+  // Required: handle passing tests
+  _onTestPass(payload) { }
+
+  // Required: handle failing tests
+  _onTestFail(payload) { }
+
+  // Required: handle run completion
+  _onRunEnd(payload) { }
+}
+```
+
+#### Available Hooks
+
+| Method | When Called | Required |
+|--------|-------------|----------|
+| `_onRunStart` | Test run begins | No |
+| `_onProjectUses` | TypeScript version detected | No |
+| `_onFileStart` | Test file starts | No |
+| `_onDescribeStart` | Describe block opens | No |
+| `_onDescribeEnd` | Describe block closes | No |
+| `_onTestPass` | Test passes | **Yes** |
+| `_onTestFail` | Test fails | **Yes** |
+| `_onRunEnd` | Test run completes | **Yes** |
+| `_onError` | Error event occurs | No |
+| `_beforePrintCompilerVersion` | Before version header | No |
+
+### Dependencies
+
+- **Production**: Keep minimal (`markdown-or-chalk` only)
+- **Peer**: `tstyche>=6.1.0` (optional)
+- **Avoid** adding new dependencies unless absolutely necessary
+
+### Anti-Patterns to Avoid
+
+- ❌ CommonJS (`require`/`module.exports`)
+- ❌ Unnecessary dependencies
+- ❌ Missing JSDoc type annotations
+- ❌ Committing auto-generated `.d.ts` files
+- ❌ Using `any` types without justification
+- ❌ Skipping tests for new functionality
+- ❌ Buffering output instead of streaming
+
+### Best Practices
+
+- ✅ Clear JSDoc comments with types
+- ✅ Export through index.js → lib/main.js
+- ✅ Small, focused functions
+- ✅ Stream output as tests execute
+- ✅ Handle all TStyche event types
+- ✅ Support both CLI and Markdown modes
+- ✅ Follow existing code patterns
+
+---
+
+## CI/CD
+
+### GitHub Actions Workflows
+
+- `lint.yml` - ESLint checks
+- `nodejs.yml` - Test suite on multiple Node.js versions
+- `ts-internal.yml` - TypeScript internal checks
+- `dependency-review.yml` - Dependency security
+
+### Required Checks
+
+All of these must pass:
+1. `npm run check:lint` - Code style
+2. `npm run check:tsc` - Type checking
+3. `npm run check:knip` - Unused code detection
+4. `npm run check:installed-check` - Dependency hygiene
+5. `npm run test:node` - Unit tests
+6. `npm run test:tstyche` - Type tests
+
+---
+
+## Publishing
+
+The package is published to npm as `@voxpelli/tstyche-reporters`.
+
+### Published Files
+
+```
+index.js
+index.d.ts
+index.d.ts.map
+lib/**/*.js
+lib/**/*.d.ts
+lib/**/*.d.ts.map
+```
+
+### Pre-publish
+
+`npm run prepublishOnly` automatically runs `npm run build` to generate declarations.

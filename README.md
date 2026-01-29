@@ -11,8 +11,8 @@ Custom [TStyche](https://tstyche.dev/) reporters with Mocha-style and dot-style 
 
 ## Features
 
-- 🎨 **Dual-mode output** – Automatically switches between CLI (colors/symbols) and Markdown (emoji) based on environment
-- 🔍 **CI detection** – Detects GitHub Actions, GitLab CI, CircleCI, Travis, and Buildkite
+- 🎨 **Dual-mode output** – Controlled via environment variable for CLI (colors/symbols) vs Markdown (emoji)
+- 🔧 **Environment control** – Set `TSTYCHE_REPORTERS_MARKDOWN=true` to enable Markdown output
 - 📊 **Two reporter styles** – Mocha-style hierarchical output or compact dot notation
 - 🔄 **Multi-version support** – Displays TypeScript version headers when testing against multiple compiler versions
 - ⚡ **Streaming output** – Tests are printed as they execute, not buffered
@@ -207,18 +207,25 @@ import type {
 } from '@voxpelli/tstyche-reporters';
 ```
 
-## CI Detection
+## Output Mode Control
 
-The reporters automatically detect CI environments by checking for these environment variables:
+The reporters support two output modes:
 
-- `CI`
-- `GITHUB_ACTIONS`
-- `GITLAB_CI`
-- `CIRCLECI`
-- `TRAVIS`
-- `BUILDKITE`
+- **CLI mode** (default): Uses ANSI colors and symbols (✔/✖)
+- **Markdown mode**: Uses emoji symbols (:white_check_mark:/:stop_sign:)
 
-When detected, output switches to Markdown mode with emoji symbols instead of ANSI colors.
+To enable Markdown mode, set the environment variable:
+
+```bash
+export TSTYCHE_REPORTERS_MARKDOWN=true
+npx tstyche --reporters ./node_modules/@voxpelli/tstyche-reporters/lib/tstyche-mocha-reporter.js,summary
+```
+
+Or inline:
+
+```bash
+TSTYCHE_REPORTERS_MARKDOWN=true npx tstyche --reporters ./node_modules/@voxpelli/tstyche-reporters/lib/tstyche-mocha-reporter.js,summary
+```
 
 ## Related Projects
 

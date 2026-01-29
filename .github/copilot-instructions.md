@@ -1,6 +1,6 @@
 # @voxpelli/tstyche-reporters
 
-Custom [TStyche](https://tstyche.dev/) reporters for TypeScript type testing, featuring Mocha-style hierarchical output and compact dot notation with automatic CI-aware Markdown/CLI dual-mode formatting.
+Custom [TStyche](https://tstyche.dev/) reporters for TypeScript type testing, featuring Mocha-style hierarchical output and compact dot notation with environment-controlled Markdown/CLI dual-mode formatting.
 
 ## Quick Overview
 
@@ -63,8 +63,8 @@ graph TB
 
 | Feature | Description |
 |---------|-------------|
-| 🎨 Dual-mode output | CLI (colors/symbols) or Markdown (emoji) based on environment |
-| 🔍 CI detection | GitHub Actions, GitLab CI, CircleCI, Travis, Buildkite |
+| 🎨 Dual-mode output | CLI (colors/symbols) or Markdown (emoji) controlled by environment variable |
+| 🔧 Environment control | Set `TSTYCHE_REPORTERS_MARKDOWN=true` for Markdown output |
 | 📊 Two styles | Mocha hierarchical or dot notation |
 | 🔄 Multi-version | TypeScript version headers when testing multiple compilers |
 | ⚡ Streaming | Real-time test output, not buffered |

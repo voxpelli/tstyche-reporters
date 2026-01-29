@@ -21,12 +21,76 @@ describe('tstyche-reporters', () => {
       assert.ok(reporter.format);
     });
 
-    it('should detect CI environment', () => {
-      // @ts-expect-error Test fixture, not a full ResolvedConfig
-      const reporter = new TstycheBaseReporter({});
+    it('should use markdown mode when TSTYCHE_REPORTERS_MARKDOWN is true', () => {
+      // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+      const originalValue = process.env['TSTYCHE_REPORTERS_MARKDOWN'];
 
-      // Should have initialized without errors
-      assert.ok(typeof reporter.format === 'object');
+      try {
+        // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+        process.env['TSTYCHE_REPORTERS_MARKDOWN'] = 'true';
+        // @ts-expect-error Test fixture, not a full ResolvedConfig
+        const reporter = new TstycheBaseReporter({});
+
+        assert.ok(reporter.format);
+        // Verify markdown mode is enabled (chalk is undefined in markdown mode)
+        assert.strictEqual(reporter.format.chalk, undefined);
+      } finally {
+        if (originalValue === undefined) {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          delete process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+        } else {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          process.env['TSTYCHE_REPORTERS_MARKDOWN'] = originalValue;
+        }
+      }
+    });
+
+    it('should use CLI mode when TSTYCHE_REPORTERS_MARKDOWN is not set', () => {
+      // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+      const originalValue = process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+
+      try {
+        // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+        delete process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+        // @ts-expect-error Test fixture, not a full ResolvedConfig
+        const reporter = new TstycheBaseReporter({});
+
+        assert.ok(reporter.format);
+        // Verify CLI mode is enabled (chalk is defined in CLI mode)
+        assert.ok(reporter.format.chalk);
+      } finally {
+        if (originalValue === undefined) {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          delete process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+        } else {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          process.env['TSTYCHE_REPORTERS_MARKDOWN'] = originalValue;
+        }
+      }
+    });
+
+    it('should use CLI mode when TSTYCHE_REPORTERS_MARKDOWN is false', () => {
+      // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+      const originalValue = process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+
+      try {
+        // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+        process.env['TSTYCHE_REPORTERS_MARKDOWN'] = 'false';
+        // @ts-expect-error Test fixture, not a full ResolvedConfig
+        const reporter = new TstycheBaseReporter({});
+
+        assert.ok(reporter.format);
+        // Verify CLI mode is enabled (chalk is defined in CLI mode)
+        assert.ok(reporter.format.chalk);
+      } finally {
+        if (originalValue === undefined) {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          delete process.env['TSTYCHE_REPORTERS_MARKDOWN'];
+        } else {
+          // eslint-disable-next-line n/no-process-env -- Testing environment variable behavior
+          process.env['TSTYCHE_REPORTERS_MARKDOWN'] = originalValue;
+        }
+      }
     });
   });
 

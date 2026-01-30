@@ -1,6 +1,6 @@
 # @voxpelli/tstyche-reporters
 
-Custom [TStyche](https://tstyche.dev/) reporters with Mocha-style and dot-style output, featuring environment-controlled Markdown/CLI dual-mode formatting.
+Custom [TSTyche](https://tstyche.org/) reporters with Mocha-style and dot-style output, featuring environment-controlled Markdown/CLI dual-mode formatting.
 
 [![npm version](https://img.shields.io/npm/v/@voxpelli/tstyche-reporters.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/tstyche-reporters)
 [![npm downloads](https://img.shields.io/npm/dm/@voxpelli/tstyche-reporters.svg?style=flat)](https://www.npmjs.com/package/@voxpelli/tstyche-reporters)
@@ -128,7 +128,7 @@ import { TstycheDotReporter } from '@voxpelli/tstyche-reporters';
 
 ### TstycheBaseReporter
 
-Abstract base class for creating custom TStyche reporters.
+Abstract base class for creating custom TSTyche reporters.
 
 ```javascript
 import { TstycheBaseReporter } from '@voxpelli/tstyche-reporters';
@@ -156,13 +156,13 @@ export default MyCustomReporter;
 new TstycheBaseReporter(resolvedConfig: ResolvedConfig)
 ```
 
-- `resolvedConfig` – TStyche's resolved configuration object
+- `resolvedConfig` – TSTyche's resolved configuration object
 
 #### Protected Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `resolvedConfig` | `ResolvedConfig` | TStyche configuration |
+| `resolvedConfig` | `ResolvedConfig` | TSTyche configuration |
 | `format` | `MarkdownOrChalk` | Dual-mode formatter instance |
 | `currentCompilerVersion` | `string \| undefined` | Current TypeScript version being tested |
 | `lastShownCompilerVersion` | `string \| undefined` | Last version header printed |
@@ -192,7 +192,7 @@ new TstycheBaseReporter(resolvedConfig: ResolvedConfig)
 
 | Method | Parameters | Returns | Description |
 |--------|------------|---------|-------------|
-| `_formatDiagnostic` | `diagnostic: Diagnostic` | `string` | Format TStyche/TypeScript diagnostic |
+| `_formatDiagnostic` | `diagnostic: Diagnostic` | `string` | Format TSTyche/TypeScript diagnostic |
 | `_printErrors` | `payload` | `void` | Print error diagnostics |
 | `_printCompilerVersion` | – | `void` | Print TypeScript version header |
 
@@ -229,6 +229,6 @@ TSTYCHE_REPORTERS_MARKDOWN=true npx tstyche --reporters ./node_modules/@voxpelli
 
 ## Related Projects
 
-- [TStyche](https://tstyche.dev/) – Type testing tool for TypeScript
+- [TSTyche](https://tstyche.org/) – Type testing tool for TypeScript
 - [markdown-or-chalk](https://github.com/voxpelli/markdown-or-chalk) – Dual-mode CLI/Markdown formatting
 - [node-test-pretty-reporter](https://github.com/voxpelli/node-test-pretty-reporter) – Similar reporter for Node.js test runner

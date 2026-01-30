@@ -1,10 +1,10 @@
 # @voxpelli/tstyche-reporters
 
-Custom [TStyche](https://tstyche.dev/) reporters for TypeScript type testing, featuring Mocha-style hierarchical output and compact dot notation with environment-controlled Markdown/CLI dual-mode formatting.
+Custom [TSTyche](https://tstyche.org/) reporters for TypeScript type testing, featuring Mocha-style hierarchical output and compact dot notation with environment-controlled Markdown/CLI dual-mode formatting.
 
 ## Quick Overview
 
-This module provides two ready-to-use TStyche reporters plus an extensible base class:
+This module provides two ready-to-use TSTyche reporters plus an extensible base class:
 
 ```mermaid
 graph LR
@@ -44,7 +44,7 @@ graph TB
 
     subgraph "Dependencies"
         BaseReporter --> MOC[markdown-or-chalk]
-        BaseReporter -.->|types| TStyche[tstyche/tstyche]
+        BaseReporter -.->|types| TSTyche[tstyche/tstyche]
     end
 
     subgraph "Type Definitions"
@@ -129,7 +129,7 @@ Example:
 /**
  * Handle a test event.
  *
- * @param {ReporterEvent} event - The TStyche event tuple
+ * @param {ReporterEvent} event - The TSTyche event tuple
  * @returns {void}
  */
 on(event) {
@@ -148,13 +148,13 @@ on(event) {
 /lib/tstyche-mocha-reporter.js   # Mocha reporter implementation
 /lib/utils.js                # Utility functions
 /test/*.spec.js              # Node.js test runner tests
-/typetests/*.test.ts         # TStyche type tests
+/typetests/*.test.ts         # TSTyche type tests
 ```
 
 ### Testing Requirements
 
 1. **Unit tests**: Use Node.js test runner with `node --test`
-2. **Type tests**: Use TStyche in `typetests/` directory
+2. **Type tests**: Use TSTyche in `typetests/` directory
 3. **Coverage**: c8 generates LCOV and text reports
 4. **All tests must pass** before committing
 
@@ -214,7 +214,7 @@ export default class MyReporter extends TstycheBaseReporter {
 - ✅ Export through index.js → lib/main.js
 - ✅ Small, focused functions
 - ✅ Stream output as tests execute
-- ✅ Handle all TStyche event types
+- ✅ Handle all TSTyche event types
 - ✅ Support both CLI and Markdown modes
 - ✅ Follow existing code patterns
 
